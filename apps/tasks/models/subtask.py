@@ -16,4 +16,4 @@ class SubTask(TaskImpl):
     class Meta:
         verbose_name = _("Subtask")
         verbose_name_plural = _("Subtasks")
-        db_table = "task_manager_subtask"
+        db_table = "task_manager_subtasks"

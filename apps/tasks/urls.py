@@ -17,8 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from .views import home
-
+from .views import create_task, tasks, statistics, home
 urlpatterns = [
     path("", home, name="home"),
+    path("create_task/", create_task, name="create-task"),
+    path("tasks/", tasks, name="task-list"),
+    path("tasks/<int:pk>", tasks, name="task-list" ),
+    path("statistics/", statistics, name="statistics" ),
+
 ]

@@ -11,4 +11,4 @@ class Task(TaskImpl):
     class Meta:
         verbose_name = _("Task")
         verbose_name_plural = _("Tasks")
-        db_table = "task_manager_task"
+        db_table = "task_manager_tasks"

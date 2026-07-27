@@ -8,7 +8,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
-        db_table = "task_manager_category"
+        db_table = "task_manager_categorys"
         constraints = [
             models.UniqueConstraint(
                 fields=["name"],

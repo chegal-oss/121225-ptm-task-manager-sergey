@@ -17,7 +17,7 @@ class TimeStampedModel(models.Model):
 class TaskImpl(TimeStampedModel):
     title = models.CharField(unique_for_date="created_at", verbose_name=_("Title"))
     description = models.TextField(blank=True, verbose_name=_("Description"))
-    deadline = models.DateTimeField(verbose_name=_("Deadline"))
+    deadline = models.DateTimeField(verbose_name=_("Deadline"), null=True)
     status = models.CharField(choices=StatusChoice, default=StatusChoice.NEW)
 
     class Meta:
