@@ -11,7 +11,7 @@ from rest_framework import status
 
 from apps.tasks.models import Task, StatusChoice
 from apps.tasks.serializers import TaskCreateSerializer, TaskCreateResponseSerializer, TaskResponseSerializer, \
-    TaskStatistics
+    TaskStatisticsSerializer
 
 
 # Create your views here.
@@ -43,7 +43,7 @@ def statistics(request):
         **{"status_" + str(choice.value).lower(): Count("id", filter=Q(status=choice.value))
            for choice in StatusChoice}
     )
-    return Response(TaskStatistics(stat).data)
+    return Response(TaskStatisticsSerializer(stat).data)
 
 
 

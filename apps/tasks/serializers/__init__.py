@@ -1,8 +1,8 @@
-from .task import TaskCreateSerializer, TaskCreateResponseSerializer, TaskResponseSerializer, TaskStatistics
+from .task import TaskCreateSerializer, TaskCreateResponseSerializer, TaskResponseSerializer, TaskStatisticsSerializer
 
 __all__ = [
     "TaskCreateSerializer",
     "TaskCreateResponseSerializer",
     "TaskResponseSerializer",
-    "TaskStatistics"
+    "TaskStatisticsSerializer"
 ]

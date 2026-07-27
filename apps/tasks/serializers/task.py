@@ -20,7 +20,7 @@ class TaskResponseSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TaskStatistics(serializers.Serializer):
+class TaskStatisticsSerializer(serializers.Serializer):
 
     def get_fields(self):
         fields = super().get_fields()
