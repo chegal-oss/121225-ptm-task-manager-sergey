@@ -17,12 +17,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from .views import create_task, tasks, statistics, home
+from .views.cls import SubTaskDetailUpdateDeleteView, SubTaskListCreateView
+from .views.func import create_task, tasks, statistics, home, create_subtask, create_category, update_category, task_detail
 urlpatterns = [
     path("", home, name="home"),
     path("create_task/", create_task, name="create-task"),
     path("tasks/", tasks, name="task-list"),
     path("tasks/<int:pk>", tasks, name="task-list" ),
     path("statistics/", statistics, name="statistics" ),
+    path("create_subtask/", create_subtask, name="create-subtask" ),
+    path("create_category/", create_category, name="create-category"),
+    path("update_category/", update_category, name="update-category"),
+    path("task_detail/", task_detail, name="task-detail"),
+    path("task_detail/<int:pk>", task_detail, name="task-detail"),
+    path("subtasks/", SubTaskListCreateView.as_view(), name="subtask-list-create"),
+    path("subtasks/<int:pk>/", SubTaskDetailUpdateDeleteView.as_view(), name="subtask-detail-update-delete"),
 
 ]

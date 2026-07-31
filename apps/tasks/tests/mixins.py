@@ -23,7 +23,7 @@ class TaskCreateMixin:
             "title": "Prepare presentation",
             "description": "Prepare materials and slides for the presentation",
             "status": StatusChoice.NEW,
-            "deadline": timezone.now() + datetime.timedelta(days=3)
+            "dead_line": timezone.now() + datetime.timedelta(days=3)
         }
         data.update(kwargs)
         return Task.objects.create(**data)
@@ -35,7 +35,7 @@ class TaskCreateMixin:
             "description" : "Find necessary information for the presentation",
             "status": StatusChoice.NEW,
             "task": task or TaskCreateMixin.create_task(),
-            "deadline": timezone.now() + datetime.timedelta(days=2)
+            "dead_line": timezone.now() + datetime.timedelta(days=2)
         }
         data.update(kwargs)
         return SubTask.objects.create(**data)
@@ -52,7 +52,7 @@ class TaskCreateMixin:
             tasks.append(Task(
                 title=fake.name(),
                 description=fake.catch_phrase(),
-                deadline=timezone.make_aware(fake.date_time()),
+                dead_line=timezone.make_aware(fake.date_time()),
                 status=random.choice(choices_list)))
 
             subtasks += [
@@ -60,7 +60,7 @@ class TaskCreateMixin:
                     task=tasks[-1],
                     title=fake.name(),
                     description=fake.catch_phrase(),
-                    deadline=timezone.make_aware(fake.date_time()),
+                    dead_line=timezone.make_aware(fake.date_time()),
                     status=random.choice(choices_list),
                 )
                 for _ in range(subtask_number)

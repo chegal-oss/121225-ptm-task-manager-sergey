@@ -18,7 +18,7 @@ class TestTaskRead(TaskCreateMixin, TestCase):
 
         self.assertEqual(Task.objects.filter(status=StatusChoice.NEW).count(),
                          len([task for task in tasks if task.status == StatusChoice.NEW]))
-        self.assertEqual(SubTask.objects.filter(Q(status=StatusChoice.DONE) & Q(deadline__lt=timezone.now())).count(),
+        self.assertEqual(SubTask.objects.filter(Q(status=StatusChoice.DONE) & Q(dead_line__lt=timezone.now())).count(),
                          len([subtask for subtask in subtasks if subtask.status == StatusChoice.DONE and
-                              subtask.deadline < timezone.now()]))
+                              subtask.dead_line < timezone.now()]))
 

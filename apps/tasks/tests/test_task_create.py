@@ -20,6 +20,6 @@ class TaskModelTest(TaskCreateMixin, TestCase):
                                        title="Create slides",
                                        description="Create presentation slides",
                                        status=StatusChoice.NEW,
-                                       deadline=timezone.now() + datetime.timedelta(days=1))
+                                       dead_line=timezone.now() + datetime.timedelta(days=1))
         self.assertEqual(subtask1.task, subtask2.task)
-        self.assertGreater(subtask1.deadline, subtask2.deadline)
+        self.assertGreater(subtask1.dead_line, subtask2.dead_line)

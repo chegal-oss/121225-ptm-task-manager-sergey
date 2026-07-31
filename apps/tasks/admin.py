@@ -28,7 +28,7 @@ class Admin(admin.ModelAdmin):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ("short_title", "description", "created_at", "deadline", "status", )
+    list_display = ("short_title", "description", "created_at", "dead_line", "status",)
     inlines = (SubTaskInline,)
 
     @admin.display(description="Title", ordering="title")
@@ -41,7 +41,7 @@ class TaskAdmin(admin.ModelAdmin):
 @admin.register(SubTask)
 class SubTaskAdmin(admin.ModelAdmin):
     form = SubTaskAdminForm
-    list_display = ("task", "title", "description", "created_at", "deadline", "status", )
+    list_display = ("task", "title", "description", "created_at", "dead_line", "status",)
     actions = ("mark_as_done",)
 
     @admin.action(description="Mark selected subtasks as Done")
