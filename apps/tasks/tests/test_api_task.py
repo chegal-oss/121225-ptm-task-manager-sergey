@@ -34,7 +34,7 @@ class TestApiTask(APITestCase, TaskCreateMixin):
         response = self.client.get(reverse("task-list", args=[1]))
         self.assertEqual(response.data["id"], 1)
         response = self.client.get(reverse("task-list", args=[11]))
-        self.assertIsNotNone(response.data.get("error", None))
+        self.assertIsNotNone(response.data.get("detail", None))
 
     def test_statistics(self):
         self.create_task(deadline=timezone.now() - timedelta(days=10))

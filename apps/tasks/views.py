@@ -2,6 +2,7 @@
 
 from django.db.models import Q, Count
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -28,11 +29,8 @@ def create_task(request):
 
 @api_view(["GET"])
 def tasks(request, pk=None):
-    try:
-        return Response(TaskResponseSerializer(Task.objects if not pk else Task.objects.get(id=pk),
-                                               many=pk is None).data)
-    except Task.DoesNotExist as e:
-        return Response({"error": f"task id = {pk} not found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response(TaskResponseSerializer(Task.objects if not pk else get_object_or_404(Task, id=pk),
+                                           many=pk is None).data)
 
 
 @api_view(["GET"])
