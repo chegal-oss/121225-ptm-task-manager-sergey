@@ -1,9 +1,10 @@
 from django.core.serializers import serialize
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F, Value
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.decorators import api_view
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -30,9 +31,14 @@ def create_task(request):
     return Response(TaskCreateResponseSerializer(serializer.save()).data, status=status.HTTP_201_CREATED)
 
 @api_view(["GET"])
-def tasks(request, pk=None):
-    return Response(TaskResponseSerializer(Task.objects if not pk else get_object_or_404(Task, id=pk),
-                                           many=pk is None).data)
+def tasks(request: Request, pk=None):
+    day_of_week = request.query_params.get("day_of_week")
+    return Response(
+        TaskResponseSerializer(
+            Task.objects.filter(
+                Q(created_at__iso_week_day=day_of_week) if day_of_week else Q())
+                    if not pk else get_object_or_404(Task, id=pk),
+                        many=pk is None).data)
 
 
 @api_view(["GET"])

@@ -73,13 +73,15 @@ class TestApiTask(APITestCase, TaskCreateMixin):
 
     def test_subtasks_list_create_view(self):
         task = self.create_task()
-        self.create_subtask(task=task, title="First subtask")
-        self.create_subtask(task=task, title="Second subtask")
-
+        [self.create_subtask(task=task, title=f"Subtask {letter}",
+                             created_at=timezone.now() + timedelta(seconds=ord(letter)))
+            for letter in "ABCDEF"
+        ]
         response = self.client.get(reverse("subtask-list-create"))
-
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data["results"]), 5)
+        self.assertTrue(response.data["results"][0]["title"].endswith("F"))
+
 
     def test_subtasks_list_create_view_create_one(self):
         task = self.create_task()
@@ -119,3 +121,19 @@ class TestApiTask(APITestCase, TaskCreateMixin):
         response = self.client.delete(reverse("subtask-detail-update-delete", args=[subtask.id]))
         self.assertEqual(response.status_code, 204)
         self.assertFalse(SubTask.objects.filter(id=subtask.id).exists())
+
+    def test_task_dey_of_week(self):
+        self.create_task(created_at=timezone.now())
+        response = self.client.get(reverse("task-list"), data={"day_of_week": timezone.now().isoweekday()})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+    def test_subtask_filters(self):
+        task = self.create_task(title="My task")
+        self.create_subtask(task=task, status=StatusChoice.DONE)
+        self.create_subtask(task=task, status=StatusChoice.NEW)
+        response = self.client.get(
+            reverse("subtask-list-create"), data={"task_title":"my","status":StatusChoice.DONE})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+
