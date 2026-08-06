@@ -137,3 +137,47 @@ class TestApiTask(APITestCase, TaskCreateMixin):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
+    def test_subtask_deadline_filter(self):
+        task = self.create_task()
+        target_deadline = timezone.now() + timedelta(days=5)
+        self.create_subtask(task=task, title="Target", dead_line=target_deadline)
+        self.create_subtask(task=task, title="Other", dead_line=timezone.now() + timedelta(days=10))
+
+        response = self.client.get(
+            reverse("subtask-list-create"),
+            data={"deadline": target_deadline.isoformat()},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["title"], "Target")
+
+    def test_subtask_search(self):
+        task = self.create_task()
+        self.create_subtask(task=task, title="Write report", description="Quarterly numbers")
+        self.create_subtask(task=task, title="Call client", description="Discuss contract")
+
+        response = self.client.get(
+            reverse("subtask-list-create"),
+            data={"search": "numbers"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["title"], "Write report")
+
+    def test_subtask_ordering_by_created_at(self):
+        task = self.create_task()
+        older = self.create_subtask(task=task, title="Older")
+        newer = self.create_subtask(task=task, title="Newer")
+        SubTask.objects.filter(id=older.id).update(created_at=timezone.now() - timedelta(days=1))
+        SubTask.objects.filter(id=newer.id).update(created_at=timezone.now())
+
+        response = self.client.get(
+            reverse("subtask-list-create"),
+            data={"ordering": "created_at"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["results"][0]["title"], "Older")
+        self.assertEqual(response.data["results"][1]["title"], "Newer")
