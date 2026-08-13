@@ -5,7 +5,7 @@ from django.utils import timezone
 from faker import Faker
 from rest_framework.test import APITestCase
 
-from apps.tasks.models import StatusChoice, Category, SubTask
+from apps.tasks.models import StatusChoice, Category, SubTask, Task
 from apps.tasks.tests.mixins import TaskCreateMixin
 
 faker = Faker()
@@ -127,6 +127,42 @@ class TestApiTask(APITestCase, TaskCreateMixin):
         response = self.client.get(reverse("task-list"), data={"day_of_week": timezone.now().isoweekday()})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
+
+    def test_task_filters(self):
+        target_deadline = timezone.now() + timedelta(days=5)
+        self.create_task(title="Target", status=StatusChoice.DONE, dead_line=target_deadline)
+        self.create_task(title="Other", status=StatusChoice.NEW, dead_line=timezone.now() + timedelta(days=10))
+
+        response = self.client.get(
+            reverse("task-list"),
+            data={"status": StatusChoice.DONE, "deadline": target_deadline.isoformat()},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["title"], "Target")
+
+    def test_task_search(self):
+        self.create_task(title="Write report", description="Quarterly numbers")
+        self.create_task(title="Call client", description="Discuss contract")
+
+        response = self.client.get(reverse("task-list"), data={"search": "numbers"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["title"], "Write report")
+
+    def test_task_ordering_by_created_at(self):
+        older = self.create_task(title="Older")
+        newer = self.create_task(title="Newer")
+        self.create_task(title="Middle")
+        Task.objects.filter(id=older.id).update(created_at=timezone.now() - timedelta(days=1))
+        Task.objects.filter(id=newer.id).update(created_at=timezone.now())
+
+        response = self.client.get(reverse("task-list"), data={"ordering": "created_at"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["title"], "Older")
 
     def test_subtask_filters(self):
         task = self.create_task(title="My task")
