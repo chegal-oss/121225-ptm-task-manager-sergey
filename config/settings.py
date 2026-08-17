@@ -16,6 +16,8 @@ import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+LOGS_DIR = BASE_DIR / "logs"
+LOGS_DIR.mkdir(exist_ok=True)
 
 env = environ.Env()
 environ.Env.read_env(BASE_DIR / ".env")
@@ -136,3 +138,42 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "apps.tasks.pagination.TaskManagerCursorPagination",
+    "PAGE_SIZE": 6,
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
+        },
+        "http": {
+            "format": "{asctime} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "server_console": {
+            "class": "logging.StreamHandler",
+            "formatter": "server",
+        },
+        "http_file": {
+            "class": "logging.FileHandler",
+            "filename": LOGS_DIR / "http_logs.log",
+            "formatter": "http",
+        },
+    },
+    "loggers": {
+        "django.server": {
+            "handlers": ["server_console", "http_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

@@ -25,7 +25,8 @@ class TestApiTask(APITestCase, TaskCreateMixin):
         [self.create_task(title=faker.word()) for _ in range(10)]
         response = self.client.get(reverse("task-list"))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 10)
+        self.assertEqual(len(response.data["results"]), 6)
+        self.assertIsNotNone(response.data["next"])
 
     def test_task_by_id(self):
         [self.create_task(title=faker.word()) for _ in range(10)]
@@ -126,7 +127,7 @@ class TestApiTask(APITestCase, TaskCreateMixin):
         self.create_task(created_at=timezone.now())
         response = self.client.get(reverse("task-list"), data={"day_of_week": timezone.now().isoweekday()})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_task_filters(self):
         target_deadline = timezone.now() + timedelta(days=5)
@@ -139,8 +140,8 @@ class TestApiTask(APITestCase, TaskCreateMixin):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["title"], "Target")
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["title"], "Target")
 
     def test_task_search(self):
         self.create_task(title="Write report", description="Quarterly numbers")
@@ -149,8 +150,8 @@ class TestApiTask(APITestCase, TaskCreateMixin):
         response = self.client.get(reverse("task-list"), data={"search": "numbers"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["title"], "Write report")
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["title"], "Write report")
 
     def test_task_ordering_by_created_at(self):
         older = self.create_task(title="Older")
@@ -162,7 +163,7 @@ class TestApiTask(APITestCase, TaskCreateMixin):
         response = self.client.get(reverse("task-list"), data={"ordering": "created_at"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]["title"], "Older")
+        self.assertEqual(response.data["results"][0]["title"], "Older")
 
     def test_subtask_filters(self):
         task = self.create_task(title="My task")

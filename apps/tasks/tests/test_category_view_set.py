@@ -46,8 +46,8 @@ class CategoryViewSetTest(APITestCase, TaskCreateMixin):
         response = self.client.get(reverse("category-list"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["name"], "Work")
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["name"], "Work")
 
     def test_count_tasks(self):
         work = self.create_category(name="Work")
